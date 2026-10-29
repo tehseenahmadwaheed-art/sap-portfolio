@@ -14,7 +14,10 @@
   "dependencies": {
     "@cap-js/hana": "^3",
     "@sap/cds": "^10.2.2",
-    "@sap/xssec": "^4"
+    "@sap/xssec": "^4",
+    "@sap-cloud-sdk/connectivity": "^4",
+    "@sap-cloud-sdk/http-client": "^4",
+    "@sap-cloud-sdk/resilience": "^4"
   },
   "cds": {
     "requires": {
@@ -34,6 +37,13 @@
       "[production]": {
         "auth": {
           "kind": "xsuaa"
+        }
+      },
+      "API_SALES_ORDER_SRV": {
+        "kind": "odata-v2",
+        "model": "srv/external/API_SALES_ORDER_SRV",
+        "credentials": {
+          "url": "https://sandbox.api.sap.com/s4hanacloud/sap/opu/odata/sap/API_SALES_ORDER_SRV"
         }
       }
     }
