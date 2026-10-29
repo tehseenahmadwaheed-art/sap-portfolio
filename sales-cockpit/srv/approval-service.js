@@ -3,10 +3,39 @@ const cds = require('@sap/cds');
 module.exports = cds.service.impl(async function () {
   // Connect to the remote S/4HANA API defined in package.json (cds.requires)
   const s4 = await cds.connect.to('API_SALES_ORDER_SRV');
-  const { SalesOrders } = this.entities;
+  const { SalesOrders, OrderApprovals } = this.entities;
+  const apiKey = () => ({ APIKey: process.env.SAP_API_KEY });
 
-  // Forward READs on SalesOrders to S/4HANA; the API key comes from an env variable, never from git
-  this.on('READ', SalesOrders, req =>
-    s4.send({ query: req.query, headers: { APIKey: process.env.SAP_API_KEY } })
-  );
+  // 1) SalesOrders list: forward every READ straight to S/4HANA
+  this.on('READ', SalesOrders, req => s4.send({ query: req.query, headers: apiKey() }));
+
+  // 2a) We need the order number to match with S/4HANA, so always read it, even if the screen didn't ask for it
+  this.before('READ', OrderApprovals, req => {
+    const cols = req.query.SELECT.columns;
+    if (cols && !cols.some(c => c === '*' || (c.ref && c.ref[0] === 'salesOrder'))) cols.push({ ref: ['salesOrder'] });
+  });
+
+  // 2) Approvals: after reading our own notes, fetch the matching orders from S/4HANA in ONE call
+  //    and fill in customer + amount by matching the sales order number
+  this.after('READ', OrderApprovals, async rows => {
+    const list = Array.isArray(rows) ? rows : rows ? [rows] : [];
+    const ids = [...new Set(list.map(r => r.salesOrder).filter(Boolean))];
+    if (!ids.length) return;
+    try {
+      const orders = await s4.send({
+        query: SELECT.from(s4.entities.A_SalesOrder)
+          .columns('SalesOrder', 'SoldToParty', 'TotalNetAmount', 'TransactionCurrency')
+          .where({ SalesOrder: { in: ids } }),
+        headers: apiKey()
+      });
+      const byId = new Map(orders.map(o => [o.SalesOrder, o]));
+      for (const r of list) {
+        const o = byId.get(r.salesOrder);
+        if (o) { r.customer = o.SoldToParty; r.netAmount = o.TotalNetAmount; r.currency = o.TransactionCurrency; }
+      }
+    } catch (e) {
+      // If S/4HANA is down or the key is missing, still show our approvals (just without SAP details)
+      cds.log('s4').warn('Could not load sales order details:', e.message);
+    }
+  });
 });

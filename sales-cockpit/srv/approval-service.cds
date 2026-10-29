@@ -7,7 +7,13 @@ service ApprovalService {
     { grant: 'READ', to: 'authenticated-user' },
     { grant: ['CREATE','UPDATE'], to: 'Approver' }
   ]
-  entity OrderApprovals as projection on cockpit.OrderApprovals;
+  // Our notes + 3 read-only fields filled in from S/4HANA at read time (never stored)
+  entity OrderApprovals as projection on cockpit.OrderApprovals {
+    *,
+    virtual null as customer  : String(10),
+    virtual null as netAmount : Decimal(16, 3),
+    virtual null as currency  : String(5)
+  };
 
   // Live S/4HANA sales orders, read-only, fetched from the SAP API sandbox
   @readonly

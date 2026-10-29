@@ -10,11 +10,17 @@ annotate ApprovalService.OrderApprovals with @(
   UI.SelectionFields: [ salesOrder, status, approver ],
   UI.LineItem: [
     { Value: salesOrder, Label: 'Sales Order' },
+    { Value: customer,   Label: 'Customer' },
+    { Value: netAmount,  Label: 'Net Amount' },
+    { Value: currency,   Label: 'Currency' },
     { Value: status,     Label: 'Status' },
     { Value: approver,   Label: 'Approver' },
     { Value: comment,    Label: 'Comment' }
   ],
   UI.FieldGroup #Main: { Data: [
+    { Value: customer,   Label: 'Customer (from S/4HANA)' },
+    { Value: netAmount,  Label: 'Net Amount (from S/4HANA)' },
+    { Value: currency,   Label: 'Currency' },
     { Value: salesOrder, Label: 'Sales Order' },
     { Value: status,     Label: 'Status' },
     { Value: approver,   Label: 'Approver' },
