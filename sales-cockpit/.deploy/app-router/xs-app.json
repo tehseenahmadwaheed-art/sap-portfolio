@@ -1,12 +1,8 @@
 {
-    "authenticationMethod":  "route",
-    "routes":  [
-                   {
-                       "source":  "^/(.*)$",
-                       "target":  "$1",
-                       "destination":  "srv-api",
-                       "authenticationType":  "xsuaa",
-                       "csrfProtection":  true
-                   }
-               ]
+  "welcomeFile": "/approvals/index.html",
+  "authenticationMethod": "route",
+  "routes": [
+    { "source": "^/approvals/(.*)$", "target": "$1", "localDir": "resources/approvals", "authenticationType": "xsuaa" },
+    { "source": "^/(.*)$", "target": "$1", "destination": "srv-api", "authenticationType": "xsuaa", "csrfProtection": true }
+  ]
 }
