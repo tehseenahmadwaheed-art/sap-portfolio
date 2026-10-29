@@ -28,3 +28,4 @@ annotate ApprovalService.OrderApprovals with @(
     { $Type: 'UI.ReferenceFacet', Label: 'Admin',    Target: '@UI.FieldGroup#Admin' }
   ]
 );
+annotate ApprovalService.OrderApprovals with @odata.draft.enabled @Capabilities.DeleteRestrictions.Deletable: false;
