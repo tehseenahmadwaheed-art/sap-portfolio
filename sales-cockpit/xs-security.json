@@ -1,0 +1,32 @@
+{
+    "scopes":  [
+                   {
+                       "name":  "$XSAPPNAME.Approver",
+                       "description":  "Approver"
+                   }
+               ],
+    "attributes":  [
+
+                   ],
+    "role-templates":  [
+                           {
+                               "name":  "Approver",
+                               "description":  "Can create and update order approvals",
+                               "scope-references":  [
+                                                        "$XSAPPNAME.Approver"
+                                                    ],
+                               "attribute-references":  [
+
+                                                        ]
+                           }
+                       ],
+    "role-collections":  [
+                             {
+                                 "name":  "SalesCockpit_Approver",
+                                 "description":  "Sales Cockpit approvers",
+                                 "role-template-references":  [
+                                                                  "$XSAPPNAME.Approver"
+                                                              ]
+                             }
+                         ]
+}

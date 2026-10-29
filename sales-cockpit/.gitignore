@@ -1,1 +1,8 @@
 @cds-models
+
+gen/
+mta_archives/
+node_modules/
+*.mtar
+.deploy/app-router/node_modules/
+default-env.json
