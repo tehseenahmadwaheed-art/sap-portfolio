@@ -14,6 +14,7 @@ entity Books : managed {
       descr    : localized String;
       genre    : Association to Genres;
       stock    : Integer;
+         isbn : String(13);
       price    : Price;
       currency : Currency;
 }
