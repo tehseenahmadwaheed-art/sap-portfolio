@@ -26,6 +26,7 @@ modules:
     requires:
       - name: sales-cockpit-auth
       - name: sales-cockpit-db
+      - name: sales-cockpit-s4-key
 
   - name: sales-cockpit-db-deployer
     type: hdb
@@ -78,3 +79,5 @@ resources:
     parameters:
       service: hana
       service-plan: hdi-shared
+  - name: sales-cockpit-s4-key
+    type: org.cloudfoundry.existing-service

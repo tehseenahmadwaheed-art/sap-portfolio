@@ -4,7 +4,16 @@ module.exports = cds.service.impl(async function () {
   // Connect to the remote S/4HANA API defined in package.json (cds.requires)
   const s4 = await cds.connect.to('API_SALES_ORDER_SRV');
   const { SalesOrders, OrderApprovals } = this.entities;
-  const apiKey = () => ({ APIKey: process.env.SAP_API_KEY });
+  // API key: on the laptop from env var SAP_API_KEY; on BTP from the user-provided service 'sales-cockpit-s4-key'
+  const fromBtp = () => {
+    try {
+      const ups = JSON.parse(process.env.VCAP_SERVICES || '{}')['user-provided'] || [];
+      return (ups.find(s => s.name === 'sales-cockpit-s4-key') || {}).credentials?.APIKey;
+    } catch { return undefined; }
+  };
+  const key = process.env.SAP_API_KEY || fromBtp();
+  if (!key) cds.log('s4').warn('No SAP API key found: S/4HANA details will be empty');
+  const apiKey = () => ({ APIKey: key });
 
   // 1) SalesOrders list: forward every READ straight to S/4HANA
   this.on('READ', SalesOrders, req => s4.send({ query: req.query, headers: apiKey() }));
