@@ -12,5 +12,16 @@
   },
   "dependencies": {
     "@sap/cds": "^10.2.2"
+  },
+  "cds": {
+    "requires": {
+      "auth": {
+        "kind": "mocked",
+        "users": {
+          "alice": { "roles": ["Approver"] },
+          "bob": { "roles": [] }
+        }
+      }
+    }
   }
 }
