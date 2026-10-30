@@ -4,6 +4,8 @@ module.exports = cds.service.impl(async function () {
   // Connect to the remote S/4HANA API defined in package.json (cds.requires)
   const s4 = await cds.connect.to('API_SALES_ORDER_SRV');
   const { SalesOrders, OrderApprovals } = this.entities;
+  // Saved approvals AND the draft copy you see while clicking Edit both need S/4HANA details
+  const approvalsAndDrafts = [OrderApprovals, OrderApprovals.drafts];
   // API key: on the laptop from env var SAP_API_KEY; on BTP from the user-provided service 'sales-cockpit-s4-key'
   const fromBtp = () => {
     try {
@@ -19,14 +21,14 @@ module.exports = cds.service.impl(async function () {
   this.on('READ', SalesOrders, req => s4.send({ query: req.query, headers: apiKey() }));
 
   // 2a) We need the order number to match with S/4HANA, so always read it, even if the screen didn't ask for it
-  this.before('READ', OrderApprovals, req => {
+  this.before('READ', approvalsAndDrafts, req => {
     const cols = req.query.SELECT.columns;
     if (cols && !cols.some(c => c === '*' || (c.ref && c.ref[0] === 'salesOrder'))) cols.push({ ref: ['salesOrder'] });
   });
 
   // 2) Approvals: after reading our own notes, fetch the matching orders from S/4HANA in ONE call
   //    and fill in customer + amount by matching the sales order number
-  this.after('READ', OrderApprovals, async rows => {
+  this.after('READ', approvalsAndDrafts, async rows => {
     const list = Array.isArray(rows) ? rows : rows ? [rows] : [];
     const ids = [...new Set(list.map(r => r.salesOrder).filter(Boolean))];
     if (!ids.length) return;
@@ -46,5 +48,11 @@ module.exports = cds.service.impl(async function () {
       // If S/4HANA is down or the key is missing, still show our approvals (just without SAP details)
       cds.log('s4').warn('Could not load sales order details:', e.message);
     }
+  });
+
+  // 3) When an approval is saved as Approved or Rejected, record WHO did it from their login.
+  //    Nobody can type someone else's name in.
+  this.before('SAVE', OrderApprovals, req => {
+    if (req.data.status && req.data.status !== 'Pending') req.data.approver = req.user.id;
   });
 });

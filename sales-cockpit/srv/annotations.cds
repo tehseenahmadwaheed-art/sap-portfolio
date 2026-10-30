@@ -4,8 +4,7 @@ annotate ApprovalService.OrderApprovals with @(
   UI.HeaderInfo: {
     TypeName      : 'Order Approval',
     TypeNamePlural: 'Order Approvals',
-    Title         : { Value: salesOrder },
-    Description   : { Value: status }
+    Title         : { Value: salesOrder }
   },
   UI.SelectionFields: [ salesOrder, status, approver ],
   UI.LineItem: [
