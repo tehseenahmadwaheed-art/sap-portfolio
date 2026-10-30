@@ -12,7 +12,6 @@ annotate ApprovalService.OrderApprovals with @(
     { Value: salesOrder, Label: 'Sales Order' },
     { Value: customer,   Label: 'Customer' },
     { Value: netAmount,  Label: 'Net Amount' },
-    { Value: currency,   Label: 'Currency' },
     { Value: status,     Label: 'Status' },
     { Value: approver,   Label: 'Approver' },
     { Value: comment,    Label: 'Comment' }
@@ -20,7 +19,6 @@ annotate ApprovalService.OrderApprovals with @(
   UI.FieldGroup #Main: { Data: [
     { Value: customer,   Label: 'Customer (from S/4HANA)' },
     { Value: netAmount,  Label: 'Net Amount (from S/4HANA)' },
-    { Value: currency,   Label: 'Currency' },
     { Value: salesOrder, Label: 'Sales Order' },
     { Value: status,     Label: 'Status' },
     { Value: approver,   Label: 'Approver' },
@@ -38,3 +36,14 @@ annotate ApprovalService.OrderApprovals with @odata.draft.enabled @Capabilities.
 
 // Show Net Amount as money in its own currency (52.65 EUR, not 52.650)
 annotate ApprovalService.OrderApprovals with { netAmount @Measures.ISOCurrency: currency; };
+
+// Proper labels for filters and fields (instead of raw names like salesOrder)
+annotate ApprovalService.OrderApprovals with {
+  salesOrder @title: 'Sales Order';
+  status     @title: 'Status';
+  approver   @title: 'Approver';
+  comment    @title: 'Comment';
+  customer   @title: 'Customer';
+  netAmount  @title: 'Net Amount';
+  currency   @title: 'Currency';
+};
