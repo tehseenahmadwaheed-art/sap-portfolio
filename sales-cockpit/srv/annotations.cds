@@ -35,3 +35,6 @@ annotate ApprovalService.OrderApprovals with @(
   ]
 );
 annotate ApprovalService.OrderApprovals with @odata.draft.enabled @Capabilities.DeleteRestrictions.Deletable: false;
+
+// Show Net Amount as money in its own currency (52.65 EUR, not 52.650)
+annotate ApprovalService.OrderApprovals with { netAmount @Measures.ISOCurrency: currency; };
